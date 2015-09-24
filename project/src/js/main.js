@@ -10,13 +10,9 @@ define('main', ["libsVendor",
    };
 
 
-   var item = new boardComponent();
-   console.log(item)
-   
-
    /*
-   *init	
+    *init
     */
-   $(holders.todoHolder).append("start")
+   var item = new boardComponent({'el': holders.todoHolder});
 
 });

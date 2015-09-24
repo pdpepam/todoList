@@ -6,19 +6,34 @@ gulp.task('html', function(){
         .pipe(connect.reload())
 });
 
+var oomponentVendor = "./src/js/**/";
 
 
-gulp.task('jsComponent', function(){
-    gulp.src('./src/js/../../*.js')
+/**
+ * livereload for components
+ * */
+
+gulp.task('htmlComponent', function(){
+    gulp.src(oomponentVendor + '*.html')
         .pipe(connect.reload())
 });
 
-gulp.task('htmlComponent', function(){
-    gulp.src('./src/js/../*.html')
-      .pipe(connect.reload())
+
+gulp.task('jsComponent', function(){
+    gulp.src(oomponentVendor + '*.js')
+        .pipe(connect.reload())
 });
 
 
+
+gulp.task('cssComponent', function(){
+    gulp.src(oomponentVendor + '/*.css')
+        .pipe(connect.reload())
+});
+
+/**
+ * init servers
+ * */
 
 gulp.task('connect', function () {
     connect.server({
@@ -28,11 +43,15 @@ gulp.task('connect', function () {
     });
 });
 
+var tasks = "./src/**/";
 gulp.task('watch', function () {
 
     gulp.watch(['./src/*.html'], ['html']);
-    gulp.watch(['./src/**/**/*.js'], ['jsComponent']);
-    gulp.watch(['./src/**/*.html'], ['htmlComponent']);
+
+    gulp.watch(tasks +  ['*.js'],   ['jsComponent']);
+    gulp.watch(tasks +  ['*.html'], ['htmlComponent']);
+    gulp.watch(tasks +  ['*.css'],  ['cssComponent']);
+
 
 });
 
