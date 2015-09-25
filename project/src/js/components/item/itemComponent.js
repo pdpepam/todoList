@@ -1,104 +1,94 @@
 define(['text!components/item/itemComponent.tpl.html',
         'text!components/item/itemElement.tpl.html',
-		"libsVendor"],function(Template,
-                               ItemElement,
-			                   libsVendor){
-	
-	var _ = libsVendor.lodash,
-	    Backbone = libsVendor.backbone,
-	    Item,
-        Element,
-        model =  Backbone.Model.extend({
-            "id"   : "id",
-            "name" : "name"
-        });
+        "libsVendor"], function (ComponentTemplate,
+                                 ComponentItemTemplate,
+                                 libsVendor) {
+
+    var _ = libsVendor.lodash,
+        Backbone = libsVendor.backbone,
+        $= libsVendor.$,
+        Component,
+        ComponentItem;
+
+
+    var collection = new Backbone.Collection;
 
     /**
-     * item*/
-    Element = Backbone.View.extend({
-        template: _.template(ItemElement),
+     * ComponentItem
+     * */
+    ComponentItem = Backbone.View.extend({
 
-        model: new Backbone.Model.extend({}),
+        initialize: function () {
+            this.render();
+        },
+
+        render: function () {
+            this.template = _.template(ComponentItemTemplate);
+            this.view = this.template();
+            this.$el.innerHTML = this.view;
+            return this.$el;
+        }
+    });
+
+    /**
+     * Component
+     * */
+    Component = Backbone.View.extend({
+
+        itemWrapper: ".todo-component_item-wrapper",
+
+        collection: collection,
 
         events:{
-            'click':"remove"
+            "keypress .todo-component_adding-task_input":"addItem"
         },
 
-        el:'div',
-
         initialize: function () {
+            this.listenTo(this.collection, 'all', this.renderCollection);
             this.render();
         },
 
         render: function () {
-            this.view = this.template;
-            return this.$el.html(this.view);
-        },
-
-        remove: function(e){
-            console.log('start');
-            this.model.destroy();
-            e.currentTarget.innerHTML = "";
-        }
-    });
-
-    /**
-     * component*/
-    Item = Backbone.View.extend({
-        $itemsHolder: ".todo-component_checking-tasks_label",
-
-
-        events: {
-            'click': "dom",
-            'click .todo-component_item': "removeTask",
-            "keyup .todo-component_adding-task_input ": "addTask"
-        },
-
-        template: _.template(Template),
-
-        initialize: function () {
-            this.collection = new Backbone.Collection;
-            this.listenTo(this.collection, 'add', this.renderCollection);
-            this.render();
-        },
-
-        render: function () {
-            var self = this;
-            this.view = this.template;
+            this.template = _.template(ComponentTemplate);
+            this.view = this.template();
             this.$el.html(this.view);
         },
 
-        renderItem: function () {
-            var self = this;
-            this.view = this.template;
-            this.$el.html(this.view);
+        renderItem: function(holder){
+            var template = _.template(ComponentTemplate);
+            var view = template();
+            return  $(holder).html(view);
+
         },
 
-        addTask: function (e) {
-            if (event.keyCode == 13) {
-                var mod = new model({"some": "id"});
+       /* renderCollection: function(){
+            console.log("work")
+            console.log("addd")
+            var self = this;
+            if(this.collection.length){
+                this.collection.each(function(item){
 
-                if (e.currentTarget.value != '') {
-                    this.collection.push({model: mod});
-                    e.currentTarget.value = ''
-                }
+                    $(".todo-component_item-wrapper").append( new ComponentItem({"el":el}).render())
+                })
             }
-        },
+        },*/
 
-        renderCollection: function () {
-            var self  = this;
-            var $wrapper =  $('.todo-component_item-wrapper');
-            $wrapper.empty();
-            this.collection.each(function (model) {
-                var itemView;
-                var el = document.createElement('div');
-                console.log(model)
-                itemView = new Element({el:el,model:model});
-                $wrapper.append(itemView.render());
-            });
+        addItem: function(e){
+            var self = this;
+            if(e.keyCode == 13 && e.currentTarget.value != ''){
+                console.log('work')
+                var el =  document.createElement('div');
+                var item = self.renderItem(el);
+                this.collection.push(item)
+                console.log(item)
+                e.currentTarget.value = "";
+            }
             console.log(this.collection.length)
         }
+
+
     });
 
-    return Item;
+    return Component;
+
 });
