@@ -13,6 +13,13 @@ define(['text!components/item/itemComponent.tpl.html',
 
     var collection = new Backbone.Collection;
 
+    var MyModel = Backbone.Model.extend({
+        constructor: function(some){
+            this.cheking = some;
+            Backbone.Model.apply(this, arguments);
+        }
+    });
+
     /**
      * ComponentItem
      * */
@@ -23,9 +30,9 @@ define(['text!components/item/itemComponent.tpl.html',
         },
 
         render: function () {
-            this.template = _.template(ComponentItemTemplate);
-            this.view = this.template();
-            this.$el.innerHTML = this.view;
+            var template = _.template(ComponentItemTemplate);
+            var view = template(this.model.toJSON());
+            this.$el.html(view);
             return this.$el;
         }
     });
@@ -55,37 +62,40 @@ define(['text!components/item/itemComponent.tpl.html',
         },
 
         renderItem: function(holder){
-            var template = _.template(ComponentTemplate);
-            var view = template();
+            var template = _.template(ComponentItemTemplate),
+                view = template();
+
             return  $(holder).html(view);
 
         },
 
-       /* renderCollection: function(){
-            console.log("work")
-            console.log("addd")
-            var self = this;
-            if(this.collection.length){
-                this.collection.each(function(item){
-
-                    $(".todo-component_item-wrapper").append( new ComponentItem({"el":el}).render())
-                })
-            }
-        },*/
-
         addItem: function(e){
             var self = this;
             if(e.keyCode == 13 && e.currentTarget.value != ''){
-                console.log('work')
-                var el =  document.createElement('div');
-                var item = self.renderItem(el);
-                this.collection.push(item)
-                console.log(item)
+                var value  = e.currentTarget.value,
+                    model = new MyModel("done");
+
+                console.log(model.toJSON())
+                /*model.set({
+                    "some":value
+                });*/
+
+                this.collection.push(model);
                 e.currentTarget.value = "";
             }
-            console.log(this.collection.length)
-        }
+        },
 
+        renderCollection: function(){
+            $(this.itemWrapper).empty();
+            var self = this;
+            if(this.collection.length){
+                this.collection.each(function(model){
+                    var el =  document.createElement('div');
+                    var item = self.renderItem(el);
+                    $(".todo-component_item-wrapper").append( new ComponentItem({"el":el,model:model}).render())
+                })
+            }
+        }
 
     });
 

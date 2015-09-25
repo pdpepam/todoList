@@ -1,0 +1,85 @@
+.todo-component_wrapper{
+     width: 400px;
+     margin: 0 auto;
+     padding-top: 20px;
+     /*remove*/
+     border: 1px solid forestgreen;
+}
+
+.todo-component{
+     font-size: 20px;
+     text-indent: 20px;
+
+}
+.todo-component_title{
+     padding-bottom: 10px;
+     font-size: 25px;
+     text-transform: uppercase;
+     font-weight: bold;
+}
+.todo-component_adding-task{}
+
+.todo-component_adding-task_input{
+     display: block;
+     height: 35px;
+     width: 95%;
+     margin: 0 auto;
+     font-size: 20px;
+     min-width: 95%;
+     max-width: 95%;
+     box-sizing:border-box;
+     padding-top: 5px;
+     text-indent: 0;
+}
+.todo-component_checking-tasks-wrapper{}
+
+.todo-component_checking-tasks{
+     padding-top: 10px;
+     padding-bottom: 10px;
+}
+.todo-component_checking-tasks_label{
+     /*remove*/
+     display: block;
+     text-indent: 5px;
+     text-transform: uppercase;
+     font-weight: bold;
+     font-size: 15px;
+     overflow: hidden;
+     display: inline-block;
+     vertical-align: middle;
+}
+
+.todo-component_checking-input{}
+.todo-component_item-wrapper{
+     font-weight: bold;
+}
+
+.todo-component_item{
+     border-top: 2px solid green;
+     padding-top: 10px;
+     padding-bottom: 10px;
+     margin-bottom: 10px;
+}
+.todo-component_item_label{  }
+.todo-component_remove-button{
+     display: inline-block;
+     background: greenyellow;
+     line-height: 20px;
+     border-radius: 20px;
+}
+.todo-component_remove-button:hover{
+     background: green;
+}
+.todo-component_item_label_checkbox{
+     display: inline-block;
+     vertical-align: middle;
+}
+.todo-component_item_label_task{
+     display: inline-block;
+     max-width: 350px;
+     overflow: hidden;
+     text-indent: 0;
+     padding-left: 5px;
+     padding-right: 20px;
+     box-sizing: border-box;
+}
