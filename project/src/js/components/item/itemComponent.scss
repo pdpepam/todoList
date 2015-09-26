@@ -1,0 +1,193 @@
+$primary-border-color : #673AB7;
+$primary-bg : #EDE7F6;
+$primary-text : #212121;
+$secondary-text : #727272;
+$white : rgba(255, 255, 255, 1);
+
+@mixin placeholder {
+    ::-webkit-input-placeholder { @content }
+    :-moz-placeholder { @content }
+    ::-moz-placeholder { @content }
+    :-ms-input-placeholder { @content }
+}
+
+input, textarea {
+    @include placeholder {
+        font-style  : italic;
+        color       : red;
+        font-weight : bold;
+    }
+}
+
+* {
+    margin     : 0;
+    padding    : 0;
+    box-sizing : border-box;
+    &:before, &:after { box-sizing : border-box; }
+}
+
+html, body {
+    height : 100%;
+    overflow: hidden;
+}
+
+body {
+    background  : $primary-bg;
+    color       : $primary-text;
+    font-weight : lighter;
+}
+
+.todoHolder { height : 100%; }
+
+.todo-component_wrapper {
+    background : $white;
+    width      : 400px;
+    height     : 90%;
+    margin     : 15px auto 0;
+    padding    : 14px 14px 0;
+    border     : 1px solid #311B92;
+}
+
+.todo-component {
+    height    : 100%;
+    font-size : 14px;
+}
+
+.todo-component_ {
+    &title {
+        padding-bottom : 10px;
+        font-size      : 25px;
+        text-transform : uppercase;
+        font-weight    : normal;
+    }
+    &adding-task { }
+    &adding-task_input {
+        display    : block;
+        width      : 100%;
+        margin     : 0 auto;
+        padding    : 4px 10px;
+        font-size  : 16px;
+        resize     : vertical;
+        border     : 1px solid #b6b6b6;
+        transition : all 0.2s linear;
+        &:focus {
+            outline      : none;
+            border-color : #512DA8;
+        }
+    }
+}
+
+.counter {
+    float      : right;
+    background : darken(#F5F5F5, 15%);
+    color      : $white;
+    padding    : 4px 8px;
+    font-size  : 16px;
+}
+
+.todo-component_checking-tasks-wrapper { }
+
+.todo-component_checking-tasks {
+    padding  : 10px 0;
+    overflow : hidden;
+}
+
+.todo-component_checking-tasks_label {
+    display        : inline-block;
+    padding-top    : 7px;
+    font-size      : 15px;
+    overflow       : hidden;
+    vertical-align : middle;
+}
+
+.todo-component_checking-input { }
+
+.todo-component_item-wrapper {
+    margin   : 0 -14px;
+    height   : calc(100% - 155px);
+    overflow : auto;
+}
+
+.todo-component_item {
+    padding       : 10px 14px 0;
+    margin-bottom : 2px;
+    overflow      : hidden;
+    background    : #F5F5F5;
+}
+
+.todo-component_item_label {
+    display     : block;
+    padding-top : 4px;
+    font-weight : lighter;
+}
+
+.todo-component_remove-button {
+    position   : relative;
+    float      : right;
+    padding    : 8px 16px;
+    overflow   : hidden;
+    background : #512DA8;
+    color      : $white;
+    outline    : none;
+    border     : none;
+    cursor     : pointer;
+    transition : all 0.2s linear;
+    &:hover {
+        background : lighten(#512DA8, 5%);
+        &:before { width : 8px; }
+    }
+    &:focus { outline : none; }
+    &:before {
+        content    : '';
+        position   : absolute;
+        top        : 0;
+        bottom     : 0;
+        left       : 0;
+        width      : 0;
+        background : lighten(#512DA8, 30%);
+        transition : all 0.2s linear;
+    }
+}
+
+.todo-component_item_label_checkbox {
+    display  : none;
+    position : relative;
+    top      : 2px;
+    &:checked {
+        + .todo-component_item_label_task {
+            &:before { color : #000066; }
+            &:after { right : -15px; }
+        }
+    }
+}
+
+.todo-component_item_label_task {
+    display        : block;
+    position       : relative;
+    font-size      : 15px;
+    padding-bottom : 10px;
+    cursor         : pointer;
+    &:before {
+        content      : '\2713';
+        display      : inline-block;
+        width        : 16px;
+        height       : 17px;
+        text-align   : center;
+        background   : $white;
+        color        : $white;
+        border       : 1px solid #b6b6b6;
+        margin-right : 5px;
+        font-size    : 12px;
+    }
+    &:after {
+        content     : '';
+        position    : absolute;
+        right       : -30px;
+        top         : -14px;
+        bottom      : 0;
+        width       : 15px;
+        transition  : all 0.2s linear;
+        background  : lighten(#FF0000, 10%);
+        will-change : right;
+    }
+}
