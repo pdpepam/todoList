@@ -6,7 +6,7 @@ var libsPath      = "../../bower_components/",
 
 require.config({
     
-    baseUrl: 'js',
+    baseUrl: './js',
 
     paths: {
 

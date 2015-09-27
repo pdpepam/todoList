@@ -6,7 +6,7 @@ define(['text!components/item/itemComponent.tpl.html',
 
     var _ = libsVendor.lodash,
         Backbone = libsVendor.backbone,
-        $= libsVendor.$,
+        $ = libsVendor.$,
         Component,
         ComponentItem;
 
@@ -37,19 +37,10 @@ define(['text!components/item/itemComponent.tpl.html',
             taskTitle: "unknow task"
         },
 
-        setDate: function(){
-
-        },
-
         validate: function(attrs, options) {
            if(attrs.taskTitle.length<2){
               return "don't valid data";
             }    
-        },
-
-
-        changedLogic: function(){
-            console.log("changedLogic");
         }
 
     });
@@ -67,13 +58,14 @@ define(['text!components/item/itemComponent.tpl.html',
         },
 
         events:{
+            "click .todo-component_item_label"      : "selected",
             "click .todo-component_item_label_edit" : "edit",
             "click .todo-component_item_input_save" : "save",
-            "click .todo-component_item_label"      : "selected"
+            "todo-component_remove-button"          : "removeSelectedItems"
         },
 
         initialize: function () {
-            this.listenTo(this.model, "destroy", this.remove);
+            this.listenTo(this.model, "destroy", this.destroy);
             this.listenTo(this.model, "set", this.render);
             return this.render();
         },
@@ -84,34 +76,32 @@ define(['text!components/item/itemComponent.tpl.html',
             return this.$el.html(view);
         },
 
-        
-        destroy: function(){
-            this.model.destroy();
-        },
-
-        remove:function(){
-           this.$el.innerHTML = " ";     
-        },
-
-        
-
         edit: function(){
-            var self = this;
-            var modelJson = this.model.toJSON();
+            var self = this,
+                modelJson = this.model.toJSON();
 
             $(this.el).find(self.holders.editInput).val(modelJson.taskTitle);
         },
 
         save: function(){
             var self = this;
-                value = $(self.holders.editInput).val();
+                value = $(this.el).find(self.holders.editInput).val();
             this.model.set({"taskTitle":value});
         },
 
         selected: function(){
             var selected = this.model.get("selected");
-                this.model.set({"selected":!selected});
+            this.model.set({"selected":true});
         },
+
+        destroy: function(){
+            this.model.destroy();
+            this.remove();
+        },
+
+        remove:function(){
+           this.$el.innerHTML = " ";     
+        }
 
     });
 
@@ -132,42 +122,37 @@ define(['text!components/item/itemComponent.tpl.html',
         model: Model,
 
         events:{
-            "keypress .todo-component_adding-task_input" :"pressInput"
+            "keypress .todo-component_adding-task_input" :"pressInput",
+            "click .todo-component_remove-button"      :"removeSelectedItems"
         },
 
         initialize: function () {
             var self = this;
 
             this.listenTo(this.collection, 'all', this.addItem);
-
+            this.listenTo(this.collection, 'all', this.renderCollectionLength);
+           /* this.listenTo(this.collection, "remove", this.removeItem);
+*/
             this.render();
         },
 
+        /*render*/
         render: function () {
             this.template = _.template(ComponentTemplate);
             this.view = this.template();
             this.$el.html(this.view);
         },
 
+        renderCollectionLength: function(){
+            var self = this;
+            $(this.el).find('.counter').html(self.collection.length);
+        },
+
         renderItem: function(model){
             return new ComponentItem({model:model});
         },
 
-
-        cleanInput: function(){
-            var el = $(this.holders.addingTaskInput);
-            el.val("");
-        },
-
-        addModel: function(value){
-            var self = this;
-            var checked ;
-            
-            model = new self.model({"taskTitle":value},{validate : true});
-            componentItem = self.renderItem(model);
-            self.collection.push(model);
-            return  $('.todo-component_item-wrapper').append(componentItem.render());
-        },
+        /*adding items*/
 
         pressInput: function(e){
             var self = this;
@@ -182,15 +167,36 @@ define(['text!components/item/itemComponent.tpl.html',
             }
         },
 
-        addDataToInput: function(data){
-            var modelToJson = data.toJSON(),
-                obj = {
-                    "idModel":"idModel",
-                    "text":modelToJson.taskTitle
-                };
+        addModel: function(value){
+            var self = this;
+            var checked ;
+            
+            model = new self.model({"taskTitle":value},{validate : true});
+            componentItem = self.renderItem(model);
+            self.collection.push(model);
+            return  $(self. holders.itemWrapper).append(componentItem.render());
+        },
 
-                
-            $(this.holders.addingTaskInput).val(obj.text);
+        cleanInput: function(){
+           $(this.holders.addingTaskInput).val("");
+        },
+
+        removeSelectedItems: function(){
+            var self = this;
+
+                this.collection.each(function(model){
+                    /*model.destroy();*/
+                    console.log(model);
+                    self.collection.remove(model)
+                    console.log(model)
+                }) ;   
+            
+        },
+
+        removeItem: function(model){
+            console.log(model)
+           $(model.el).remove()
+
         }
 
     });
