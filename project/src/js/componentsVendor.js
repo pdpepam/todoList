@@ -3,19 +3,19 @@ var gulp    = require('gulp'),
 
 gulp.task('html', function(){
     gulp.src('src/*.html')
-        .pipe(connect.reload())
+        .pipe(connect.reload());
 });
 
 
 
 gulp.task('jsComponent', function(){
     gulp.src('./src/js/../../*.js')
-        .pipe(connect.reload())
+        .pipe(connect.reload());
 });
 
 gulp.task('htmlComponent', function(){
     gulp.src('./src/js/../*.html')
-      .pipe(connect.reload())
+      .pipe(connect.reload());
 });
 
 

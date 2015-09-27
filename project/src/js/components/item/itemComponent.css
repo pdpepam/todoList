@@ -59,7 +59,7 @@ body {
   font-size: 16px;
   resize: vertical;
   border: 1px solid #b6b6b6;
-  transition: all 0.2s linear; }
+  }
   .todo-component_adding-task_input:focus {
     outline: none;
     border-color: #512DA8; }

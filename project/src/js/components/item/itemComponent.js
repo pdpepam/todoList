@@ -10,9 +10,8 @@ define(['text!components/item/itemComponent.tpl.html',
         Component,
         ComponentItem;
 
-    var EventBus = _.extend({}, Backbone.Events);  
 
-    var collection = new Backbone.Collection;
+    var collection = new Backbone.Collection();
 
      /**
      * ComponentItem Model
@@ -21,10 +20,10 @@ define(['text!components/item/itemComponent.tpl.html',
         self:this,
 
         defaults:{
-            taskDate:function(){
+           /* taskDate:function(){
                     var fullDate = new Date(),
                         date = {
-                            year  : function(){return fullDate.getFullYear()}(),
+                            year  : (function(){return fullDate.getFullYear()})(),
                             month : function(){return fullDate.getMonth()}(),
                             date  : function(){return fullDate.getDate()}(),
                             hour  : function(){return fullDate.getHours()}(),
@@ -32,7 +31,7 @@ define(['text!components/item/itemComponent.tpl.html',
                         }
 
                         return date;
-                    }(),
+                    }(),*/
             changeable: false,
             selected:false,
             taskTitle: "unknow task"
@@ -50,7 +49,7 @@ define(['text!components/item/itemComponent.tpl.html',
 
 
         changedLogic: function(){
-            console.log("changedLogic")
+            console.log("changedLogic");
         }
 
     });
@@ -62,41 +61,57 @@ define(['text!components/item/itemComponent.tpl.html',
 
         className: "todo-component_item",    
 
+        holders:{
+            "editInput": ".todo-component_item_input_edit",
+            "saveInput": ".todo-component_item_input_save"
+        },
+
         events:{
-            "click .todo-component_item_label" : "selected",
-            "click .todo-component_item_label_edit" : "edit"
+            "click .todo-component_item_label_edit" : "edit",
+            "click .todo-component_item_input_save" : "save",
+            "click .todo-component_item_label"      : "selected"
         },
 
         initialize: function () {
             this.listenTo(this.model, "destroy", this.remove);
+            this.listenTo(this.model, "set", this.render);
             return this.render();
         },
 
         render: function () {
-            var template = _.template(ComponentItemTemplate);
-            var view = template(this.model.toJSON());
-            return this.$el.html(view);;
+            var template = _.template(ComponentItemTemplate),
+                view = template(this.model.toJSON());
+            return this.$el.html(view);
         },
 
+        
         destroy: function(){
             this.model.destroy();
-            return true;
         },
 
         remove:function(){
-           return this.$el.innerHTML = " ";     
+           this.$el.innerHTML = " ";     
+        },
+
+        
+
+        edit: function(){
+            var self = this;
+            var modelJson = this.model.toJSON();
+
+            $(this.el).find(self.holders.editInput).val(modelJson.taskTitle);
+        },
+
+        save: function(){
+            var self = this;
+                value = $(self.holders.editInput).val();
+            this.model.set({"taskTitle":value});
         },
 
         selected: function(){
             var selected = this.model.get("selected");
-                this.model.set({"selected":!selected})
-                console.log(this.model.toJSON())
+                this.model.set({"selected":!selected});
         },
-
-        edit: function(){
-           /* this.model.set({changeable: true})*/
-            EventBus.trigger("editModel", this.model);
-        }
 
     });
 
@@ -124,7 +139,6 @@ define(['text!components/item/itemComponent.tpl.html',
             var self = this;
 
             this.listenTo(this.collection, 'all', this.addItem);
-            EventBus.on("editModel", function(data){self.addDataToInput(data)});
 
             this.render();
         },
@@ -136,7 +150,6 @@ define(['text!components/item/itemComponent.tpl.html',
         },
 
         renderItem: function(model){
-            console.log(model)
             return new ComponentItem({model:model});
         },
 
@@ -146,44 +159,14 @@ define(['text!components/item/itemComponent.tpl.html',
             el.val("");
         },
 
-        addEditModel: function(value){
+        addModel: function(value){
             var self = this;
             var checked ;
-
-          
-            var actions = {
-                 addItem : function(){
-                    console.log("addItem")
-                    model = new self.model({"taskTitle":value},{validate : true});
-                    componentItem = self.renderItem(model);
-                    self.collection.push(model);
-                    return  $('.todo-component_item-wrapper').append(componentItem.render());
-                 },
-              
-                 editItem: function(){
-                    console.log("editItem")
-                    return "hren"
-                 }
-            };
-
-              function colHasChengableModel(){
-                var result = false ;
-
-                self.collection.each(function(model){
-
-                    if(model.changeable){
-                        console.log(model.toJSON())
-                        result = true;
-                    }
-
-                })
-                    
-                return result;
-            } ; 
-
-            var result = new colHasChengableModel();
-        
-            return (result)?actions["addItem"]():actions["editItem"]();
+            
+            model = new self.model({"taskTitle":value},{validate : true});
+            componentItem = self.renderItem(model);
+            self.collection.push(model);
+            return  $('.todo-component_item-wrapper').append(componentItem.render());
         },
 
         pressInput: function(e){
@@ -193,10 +176,10 @@ define(['text!components/item/itemComponent.tpl.html',
                 var value = e.currentTarget.value,
                     componentItem;
                 
-                self.addEditModel(value);
+                self.addModel(value);
                 self.cleanInput();
                
-            };
+            }
         },
 
         addDataToInput: function(data){
