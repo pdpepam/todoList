@@ -1,22 +1,56 @@
 define(['text!components/item/itemComponent.tpl.html',
-    'text!components/item/itemElement.tpl.html',
-    "libsVendor"], function (ComponentTemplate,
-                             ComponentItemTemplate,
-                             libsVendor) {
+        'text!components/item/itemElement.tpl.html',
+        "libsVendor"], function (ComponentTemplate,
+                                 ComponentItemTemplate,
+                                 libsVendor) {
 
     var _ = libsVendor.lodash,
         Backbone = libsVendor.backbone,
-        $ = libsVendor.$,
+        $= libsVendor.$,
         Component,
         ComponentItem;
 
+    var EventBus = _.extend({}, Backbone.Events);  
 
     var collection = new Backbone.Collection;
 
-    var MyModel = Backbone.Model.extend({
-        defaults: {
-            selected: false,
-            taskTitle: "task is undefined",
+     /**
+     * ComponentItem Model
+     * */
+    var Model = Backbone.Model.extend({
+        self:this,
+
+        defaults:{
+            taskDate:function(){
+                    var fullDate = new Date(),
+                        date = {
+                            year  : function(){return fullDate.getFullYear()}(),
+                            month : function(){return fullDate.getMonth()}(),
+                            date  : function(){return fullDate.getDate()}(),
+                            hour  : function(){return fullDate.getHours()}(),
+                            minute: function(){return fullDate.getMinutes()}(),
+                        }
+
+                        return date;
+                    }(),
+            changeable: false,
+            selected:false,
+            taskTitle: "unknow task"
+        },
+
+        setDate: function(){
+
+        },
+
+        validate: function(attrs, options) {
+           if(attrs.taskTitle.length<2){
+              return "don't valid data";
+            }    
+        },
+
+
+        changedLogic: function(){
+            console.log("changedLogic")
         }
 
     });
@@ -26,38 +60,44 @@ define(['text!components/item/itemComponent.tpl.html',
      * */
     ComponentItem = Backbone.View.extend({
 
-        className: "todo-component_item",
+        className: "todo-component_item",    
 
-        events: {
-            "click .todo-component_item_label": "selected"
+        events:{
+            "click .todo-component_item_label" : "selected",
+            "click .todo-component_item_label_edit" : "edit"
         },
 
         initialize: function () {
-            this.render();
+            this.listenTo(this.model, "destroy", this.remove);
+            return this.render();
         },
-
 
         render: function () {
-            this.listenTo(this.model, "destroy", this.remove);
             var template = _.template(ComponentItemTemplate);
             var view = template(this.model.toJSON());
-            this.$el.html(view);
-            return this.$el;
+            return this.$el.html(view);;
         },
 
-        destroy: function () {
-            this.model.destroy;
+        destroy: function(){
+            this.model.destroy();
+            return true;
         },
 
-        remove: function () {
-            this.$el.innerHTML = " ";
+        remove:function(){
+           return this.$el.innerHTML = " ";     
         },
 
-        selected: function () {
+        selected: function(){
             var selected = this.model.get("selected");
-            this.model.set({selected: !selected})
-            $(this.$el).toggleClass('checked');
+                this.model.set({"selected":!selected})
+                console.log(this.model.toJSON())
+        },
+
+        edit: function(){
+           /* this.model.set({changeable: true})*/
+            EventBus.trigger("editModel", this.model);
         }
+
     });
 
     /**
@@ -65,53 +105,110 @@ define(['text!components/item/itemComponent.tpl.html',
      * */
     Component = Backbone.View.extend({
 
+        holders:{
+            "addingTaskInput" : ".todo-component_adding-task_input",
+            "itemWrapper"     : ".todo-component_item-wrapper"
+        },
+
         itemWrapper: ".todo-component_item-wrapper",
 
         collection: collection,
 
-        events: {
-            "keypress .todo-component_adding-task_input": "addItem"
+        model: Model,
+
+        events:{
+            "keypress .todo-component_adding-task_input" :"pressInput"
         },
 
         initialize: function () {
-            this.listenTo(this.collection, 'all', this.addItem);
-            this.render();
+            var self = this;
 
+            this.listenTo(this.collection, 'all', this.addItem);
+            EventBus.on("editModel", function(data){self.addDataToInput(data)});
+
+            this.render();
         },
 
         render: function () {
             this.template = _.template(ComponentTemplate);
             this.view = this.template();
             this.$el.html(this.view);
-
         },
 
-        renderItem: function (holder) {
-
-
+        renderItem: function(model){
+            console.log(model)
+            return new ComponentItem({model:model});
         },
 
 
-        addItem: function (e) {
+        cleanInput: function(){
+            var el = $(this.holders.addingTaskInput);
+            el.val("");
+        },
+
+        addEditModel: function(value){
             var self = this;
-            if (e.keyCode == 13 && e.currentTarget.value != '') {
-                var value = e.currentTarget.value
-                model = new MyModel();
+            var checked ;
 
+          
+            var actions = {
+                 addItem : function(){
+                    console.log("addItem")
+                    model = new self.model({"taskTitle":value},{validate : true});
+                    componentItem = self.renderItem(model);
+                    self.collection.push(model);
+                    return  $('.todo-component_item-wrapper').append(componentItem.render());
+                 },
+              
+                 editItem: function(){
+                    console.log("editItem")
+                    return "hren"
+                 }
+            };
 
-                if (value.length > 1) {
-                    model.set({"taskTitle": value});
-                }
+              function colHasChengableModel(){
+                var result = false ;
 
-                var componentItem = new ComponentItem({model: model});
+                self.collection.each(function(model){
 
-                this.collection.push(model);
+                    if(model.changeable){
+                        console.log(model.toJSON())
+                        result = true;
+                    }
 
-                $(".todo-component_item-wrapper").append(componentItem.render());
-                e.currentTarget.value = "";
-            }
+                })
+                    
+                return result;
+            } ; 
+
+            var result = new colHasChengableModel();
+        
+            return (result)?actions["addItem"]():actions["editItem"]();
+        },
+
+        pressInput: function(e){
+            var self = this;
+
+            if(e.keyCode == 13 && e.currentTarget.value.length){
+                var value = e.currentTarget.value,
+                    componentItem;
+                
+                self.addEditModel(value);
+                self.cleanInput();
+               
+            };
+        },
+
+        addDataToInput: function(data){
+            var modelToJson = data.toJSON(),
+                obj = {
+                    "idModel":"idModel",
+                    "text":modelToJson.taskTitle
+                };
+
+                
+            $(this.holders.addingTaskInput).val(obj.text);
         }
-
 
     });
 
