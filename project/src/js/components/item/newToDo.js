@@ -34,7 +34,9 @@ define(['text!components/item/itemComponent.tpl.html',
         model:TodoItemModel,
 
         done: function(){
-            return this.filter(function(item){})
+            return this.filter(function(item){
+                return item;
+            })
         }
     });
 
@@ -54,14 +56,13 @@ define(['text!components/item/itemComponent.tpl.html',
         },
 
         events:{
-            "click .todo-component_item_label"      : "selected",
-            "click .todo-component_item_label_edit" : "edit",
-            "click .todo-component_item_input_save" : "save",
-            "todo-component_remove-button"          : "removeSelectedItems"
+            "click .todo-component_item_label"      : "selectItem",
         },
-
+            
         initialize: function(){
             this.listenTo(this.model, 'change', this.render);
+            this.listenTo(this.model, 'destroy', this.remove);
+
             this.render();
         },
 
@@ -71,9 +72,17 @@ define(['text!components/item/itemComponent.tpl.html',
             return this.$el;
         },
 
+        selectItem: function(){
+            this.model.set({ "checked": true});
+        },
+
         /*manipulation*/
         edit: function(){},
-        close: function(){},
+
+        remove: function(){
+            $(this.$el).remove();
+        },
+
         update: function(){}
 
     });
@@ -86,7 +95,8 @@ define(['text!components/item/itemComponent.tpl.html',
         },
 
         events:{
-            "keypress .todo-component_adding-task_input" :"createOneItem"
+            "keypress .todo-component_adding-task_input": "createOneItem",
+            "click .todo-component_remove-button"       : "removeSelctedItems"
         },
 
         template: _.template(ComponentTemplate),
@@ -100,10 +110,12 @@ define(['text!components/item/itemComponent.tpl.html',
         },
 
         render: function(){
+
             $(this.$el).html(this.template());
         },
 
         renderCollectionLength: function(){
+
             $(this.el).find('.counter').html(this.collection.length);
         },
 
@@ -121,12 +133,17 @@ define(['text!components/item/itemComponent.tpl.html',
         },
 
         cleanInput: function(){
+
             $(this.$el).find('.todo-component_adding-task_input').val(' ');
+
         },
 
         removeSelctedItems: function(){
-            this.collection.each(function(){
-
+            _.each(this.collection.done(), function(item){
+                var modelToJson = item.toJSON();
+                if(modelToJson.checked){
+                    item.clear();    
+                }
             })
         }
 
