@@ -35,6 +35,8 @@ define(['text!components/item/itemComponent.tpl.html',
 
     var TodoItem = Backbone.View.extend({
 
+        model:TodoItemModel,
+
         className: "todo-component_item",
 
         template: _.template(ComponentItemTemplate),
@@ -57,8 +59,7 @@ define(['text!components/item/itemComponent.tpl.html',
         },
 
         render: function () {
-            console.log(this.model);
-            var view = this.template();
+            var view = this.template(this.model.toJSON());
             this.$el.html(view);
             return this.$el;
         },
@@ -87,7 +88,7 @@ define(['text!components/item/itemComponent.tpl.html',
 
         initialize: function(){
             this.listenTo(this.collection, 'all', this.renderCollectionLength);
-            this.listenTo(this.collection, 'add', this.addOneItem());
+            this.listenTo(this.collection, 'add', this.addOneItem);
             this.render();
         },
 
@@ -102,14 +103,13 @@ define(['text!components/item/itemComponent.tpl.html',
         createOneItem: function(e){
             if(e.keyCode == 13){
                 var value = e.currentTarget.value;
-                this.addOneItem(value);
+                this.collection.push({taskTitle:value});
                 this.cleanInput();
             }
         },
 
         addOneItem: function(model){
             var component = new TodoItem({model:model}).render();
-            this.collection.push({title:model});
             $(".todo-component_item-wrapper").append(component);
         },
 
