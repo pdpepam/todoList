@@ -15,7 +15,7 @@ define(['text!components/item/itemComponent.tpl.html',
         defaults: function () {
             return {
                 "taskTitle": "unnamed task",
-                "checkded": false
+                "checked": false
             };
         },
 
@@ -30,7 +30,14 @@ define(['text!components/item/itemComponent.tpl.html',
         }
     });
 
-    var TodoItemCollection = Backbone.Collection.extend({model:TodoItemModel});
+    var TodoItemCollection = Backbone.Collection.extend({
+        model:TodoItemModel,
+
+        done: function(){
+            return this.filter(function(item){})
+        }
+    });
+
     var todoItemCollection = new TodoItemCollection;
 
     var TodoItem = Backbone.View.extend({
@@ -116,13 +123,16 @@ define(['text!components/item/itemComponent.tpl.html',
         cleanInput: function(){
             $(this.$el).find('.todo-component_adding-task_input').val(' ');
         },
-        removeOneItem: function(){},
-        removeSelctedItems: function(){}
+
+        removeSelctedItems: function(){
+            this.collection.each(function(){
+
+            })
+        }
 
 
     });
 
 
     return TodoComponent;
-
 });
