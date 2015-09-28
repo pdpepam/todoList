@@ -6,7 +6,7 @@ var libsPath      = "../../bower_components/",
 
 require.config({
     
-    baseUrl: './js',
+    baseUrl: 'js',
 
     paths: {
 
@@ -19,14 +19,9 @@ require.config({
       
         /**
          *apps components */
-        'boardComponent'   : componentsPath + 'item/itemComponent',
+        'boardComponent'   : componentsPath + 'item/newToDo'
         
-        /**
-         * components wendor*/
-        'componentsVendor': 'components/componentsVendor/main',
 
-        //libsVendor
-        "libsVendor" : "libsVendor"
 
     },
 
