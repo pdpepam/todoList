@@ -59,7 +59,7 @@ body {
   font-size: 16px;
   resize: vertical;
   border: 1px solid #b6b6b6;
-  }
+  transition: all 0.2s linear; }
   .todo-component_adding-task_input:focus {
     outline: none;
     border-color: #512DA8; }
@@ -142,7 +142,7 @@ body {
   cursor: pointer; }
   .todo-component_item_label_task:before {
     content: '\2713';
-    display: inline-block;
+    float: left;
     width: 16px;
     height: 17px;
     text-align: center;
@@ -162,25 +162,17 @@ body {
     background: #ff3333;
     will-change: right; }
 
-/*# sourceMappingURL=itemComponent.css.map */
+.todo-component_item_label_task {
+  outline: none; }
 
-.todo-component_item_label_task{
-  outline: none;
-}
-
-.todo-component_item_label_task_title__unchecked{
+.todo-component_item_label_task_title__unchecked {
   background: #F5F5F5;
-  border: none;
-}
+  border: none; }
 
-.todo-component_item-wrapper{
-  min-height: 65px;
-}
-.todo-component_wrapper{
-  height: auto;
-}
+.todo-component_item-wrapper {
+  min-height: 65px; }
 
+.todo-component_item_label_task_title {
+  width: calc(100% - 21px); }
 
-.todo-component_item_label_task_title{
-  width: 100%;
-}
+/*# sourceMappingURL=itemComponent.css.map */

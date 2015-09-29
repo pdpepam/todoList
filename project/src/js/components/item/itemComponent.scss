@@ -27,8 +27,8 @@ input, textarea {
 }
 
 html, body {
-    height : 100%;
-    overflow: hidden;
+    height   : 100%;
+    overflow : hidden;
 }
 
 body {
@@ -169,7 +169,7 @@ body {
     cursor         : pointer;
     &:before {
         content      : '\2713';
-        display      : inline-block;
+        float        : left;
         width        : 16px;
         height       : 17px;
         text-align   : center;
@@ -190,4 +190,23 @@ body {
         background  : lighten(#FF0000, 10%);
         will-change : right;
     }
+}
+
+.todo-component_item_label_task {
+    outline : none;
+}
+
+.todo-component_item_label_task_title__unchecked {
+    background : #F5F5F5;
+    border     : none;
+}
+
+.todo-component_item-wrapper {
+    min-height : 65px;
+}
+
+//.todo-component_wrapper { height : auto; }
+
+.todo-component_item_label_task_title {
+    width : calc(100% - 21px);
 }
