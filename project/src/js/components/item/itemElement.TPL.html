@@ -1,15 +1,11 @@
 <!--todo-component_item-->
 <label class="todo-component_item_label" >
 	<input type="checkbox" class="todo-component_item_label_checkbox"/>
-	<span  class="todo-component_item_label_task"><%=obj.taskTitle%></span>
+	<span  class="todo-component_item_label_task"></span>
+	<textarea type="text" class="todo-component_item_label_task_title todo-component_item_label_task_title__unchecked"><%=obj.taskTitle%></textarea>
 </label>
 
-	<div class="todo-component_item_modelstate">
-		<span class="todo-component_item_label_edit">edit</span>
-	  <span class="todo-component_item_input_save">save</span>
-	</div>
-	
-	<input type="text" class="todo-component_item_input_edit" placeholder="unknow">
+
 	
 	
 

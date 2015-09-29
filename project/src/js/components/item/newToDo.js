@@ -21,47 +21,51 @@ define(['text!components/item/itemComponent.tpl.html',
 
         initialize: function () {
             if (!this.get("taskTitle") && this.get("taskTitle").length) {
-                 this.set({"taskTitle": this.defaults.taskTitle});
+                this.set({"taskTitle": this.defaults.taskTitle});
             }
         },
 
-        clear: function(){
+        clear: function () {
             this.destroy();
         },
 
-        checkedModel: function(){
-            this.set({"checked":true});
+        checkedModel: function () {
+            this.set({"checked": true});
         },
 
-        unchecedModel: function(){
-            this.set({"checked":true});
+        unchecedModel: function () {
+            this.set({"checked": true});
         },
 
-        toogleCheckeModel: function(){
+        toogleCheckeModel: function () {
             var checkedState = this.get("checked");
-                this.set({"checked": !checkedState});
+            this.set({"checked": !checkedState});
             return !checkedState;
+        },
+
+        updateTitle: function (value) {
+            this.set({"taskTitle": value});
         }
 
     });
 
     var TodoItemCollection = Backbone.Collection.extend({
-        model:TodoItemModel,
+        model: TodoItemModel,
 
-        done: function(){
-            return this.filter(function(item){
+        done: function () {
+            return this.filter(function (item) {
                 return item;
             })
         },
 
-        checkedAllModels: function(){
-            this.each(function(model){
+        checkedAllModels: function () {
+            this.each(function (model) {
                 model.checkedModel();
             })
         },
 
-        uncheckedAllModels: function(){
-            this.each(function(model){
+        uncheckedAllModels: function () {
+            this.each(function (model) {
                 model.unchecedModel();
             })
         }
@@ -71,22 +75,26 @@ define(['text!components/item/itemComponent.tpl.html',
 
     var TodoItem = Backbone.View.extend({
 
-        model:TodoItemModel,
+        model: TodoItemModel,
 
         className: "todo-component_item",
 
         template: _.template(ComponentItemTemplate),
 
-        holders:{
+        holders: {
+            "todoComponentInput": ".todo-component_item_label_task",
+
             "editInput": ".todo-component_item_input_edit",
             "saveInput": ".todo-component_item_input_save"
         },
 
-        events:{
-            "click .todo-component_item_label_checkbox"      : "toggleChecked"
+        events: {
+            "click .todo-component_item_label_checkbox": "toggleChecked",
+            "click .todo-component_item_label_task_title": "edit",
+            "blur .todo-component_item_label_task_title": "save"
         },
-            
-        initialize: function(){
+
+        initialize: function () {
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change', this.setChecked);
             this.render();
@@ -98,52 +106,60 @@ define(['text!components/item/itemComponent.tpl.html',
             return this.$el;
         },
 
-        toggleChecked: function(){
-          if(this.model.toogleCheckeModel()){
-              this.setChecked()
-          }else{
-              this.unChecked()
-          }
+        toggleChecked: function () {
+            if (this.model.toogleCheckeModel()) {
+                this.setChecked()
+            } else {
+                this.unChecked()
+            }
 
         },
 
-        setChecked: function(){
-            $(this.$el).find(".todo-component_item_label_checkbox").prop({"checked":true})
+        setChecked: function () {
+            $(this.$el).find(".todo-component_item_label_checkbox").prop({"checked": true})
         },
 
-        unChecked: function(){
-            $(this.$el).find(".todo-component_item_label_checkbox").prop({"checked":false})
+        unChecked: function () {
+            $(this.$el).find(".todo-component_item_label_checkbox").prop({"checked": false})
         },
 
         /*manipulation*/
-        edit: function(){},
-
-        remove: function(){
-            $(this.$el).remove();
+        edit: function () {
+            $(this.$el).find('.todo-component_item_label_task_title').removeClass("todo-component_item_label_task_title__unchecked");
         },
 
-        update: function(){}
+        save: function () {
+            var value = $(this.$el).find('.todo-component_item_label_task_title').val();
+            this.model.updateTitle(value);
+            $(this.$el).find('.todo-component_item_label_task_title').addClass("todo-component_item_label_task_title__unchecked");
+        },
+
+        remove: function () {
+            $(this.$el).remove();
+        }
 
     });
 
     var TodoComponent = Backbone.View.extend({
 
-        holders:{
-            "addingTaskInput" : ".todo-component_adding-task_input",
-            "itemWrapper"     : ".todo-component_item-wrapper"
+        className:"todo-component_wrapper",
+
+        holders: {
+            "addingTaskInput": ".todo-component_adding-task_input",
+            "itemWrapper": ".todo-component_item-wrapper"
         },
 
-        events:{
+        events: {
             "keypress .todo-component_adding-task_input": "createOneItem",
-            "click .todo-component_remove-button"       : "removeSelectedItems",
+            "click .todo-component_remove-button": "removeSelectedItems",
             "click .todo-component_checking-tasks_label": "selectAllItems"
         },
 
         template: _.template(ComponentTemplate),
 
-        collection:todoItemCollection,
+        collection: todoItemCollection,
 
-        initialize: function(){
+        initialize: function () {
             this.listenTo(this.collection, 'all', this.renderCollectionLength);
             this.listenTo(this.collection, 'all', this.renderAdditional);
             this.listenTo(this.collection, 'add', this.addOneItem);
@@ -151,53 +167,51 @@ define(['text!components/item/itemComponent.tpl.html',
             this.renderAdditional();
         },
 
-        render: function(){
+        render: function () {
             $(this.$el).html(this.template());
 
         },
 
-        renderAdditional: function(){
-            if(this.collection.length){
-                console.log("show ",this.collection.length)
-                $(this.$el).find('.todo-component_checking-tasks-wrapper').show()
+        renderAdditional: function () {
+            if (this.collection.length) {
+                $(this.$el).find('.todo-component_checking-tasks-wrapper').show();
             }
-            else{
-                $(this.$el).find('.todo-component_checking-tasks-wrapper').hide()
-                console.log("hide", this.collection.length)
+            else {
+                $(this.$el).find('.todo-component_checking-tasks-wrapper').hide();
             }
         },
 
-        renderCollectionLength: function(){
+        renderCollectionLength: function () {
             $(this.el).find('.counter').html(this.collection.length);
         },
 
-        createOneItem: function(e){
-            if(e.keyCode == 13){
+        createOneItem: function (e) {
+            if (e.keyCode == 13) {
                 var value = e.currentTarget.value;
-                this.collection.push({taskTitle:value});
+                this.collection.push({taskTitle: value});
                 this.cleanInput();
             }
         },
 
-        addOneItem: function(model) {
-            var component = new TodoItem({model:model}).render();
+        addOneItem: function (model) {
+            var component = new TodoItem({model: model}).render();
             $(".todo-component_item-wrapper").append(component);
         },
 
-        cleanInput: function(){
+        cleanInput: function () {
             $(this.$el).find('.todo-component_adding-task_input').val(' ');
         },
 
-        removeSelectedItems: function(){
-            _.each(this.collection.done(), function(item){
+        removeSelectedItems: function () {
+            _.each(this.collection.done(), function (item) {
                 var modelToJson = item.toJSON();
-                if(modelToJson.checked){
-                    item.clear();    
+                if (modelToJson.checked) {
+                    item.clear();
                 }
             })
         },
 
-        selectAllItems: function(){
+        selectAllItems: function () {
             this.collection.checkedAllModels();
         }
 
