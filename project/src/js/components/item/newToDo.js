@@ -145,12 +145,26 @@ define(['text!components/item/itemComponent.tpl.html',
 
         initialize: function(){
             this.listenTo(this.collection, 'all', this.renderCollectionLength);
+            this.listenTo(this.collection, 'all', this.renderAdditional);
             this.listenTo(this.collection, 'add', this.addOneItem);
             this.render();
+            this.renderAdditional();
         },
 
         render: function(){
             $(this.$el).html(this.template());
+
+        },
+
+        renderAdditional: function(){
+            if(this.collection.length){
+                console.log("show ",this.collection.length)
+                $(this.$el).find('.todo-component_checking-tasks-wrapper').show()
+            }
+            else{
+                $(this.$el).find('.todo-component_checking-tasks-wrapper').hide()
+                console.log("hide", this.collection.length)
+            }
         },
 
         renderCollectionLength: function(){
