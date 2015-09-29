@@ -27,7 +27,22 @@ define(['text!components/item/itemComponent.tpl.html',
 
         clear: function(){
             this.destroy();
+        },
+
+        checkedModel: function(){
+            this.set({"checked":true});
+        },
+
+        unchecedModel: function(){
+            this.set({"checked":true});
+        },
+
+        toogleCheckeModel: function(){
+            var checkedState = this.get("checked");
+                this.set({"checked": !checkedState});
+            return !checkedState;
         }
+
     });
 
     var TodoItemCollection = Backbone.Collection.extend({
@@ -36,6 +51,18 @@ define(['text!components/item/itemComponent.tpl.html',
         done: function(){
             return this.filter(function(item){
                 return item;
+            })
+        },
+
+        checkedAllModels: function(){
+            this.each(function(model){
+                model.checkedModel();
+            })
+        },
+
+        uncheckedAllModels: function(){
+            this.each(function(model){
+                model.unchecedModel();
             })
         }
     });
@@ -56,13 +83,12 @@ define(['text!components/item/itemComponent.tpl.html',
         },
 
         events:{
-            "click .todo-component_item_label"      : "selectItem",
+            "click .todo-component_item_label_checkbox"      : "toggleChecked"
         },
             
         initialize: function(){
-            this.listenTo(this.model, 'change', this.render);
             this.listenTo(this.model, 'destroy', this.remove);
-
+            this.listenTo(this.model, 'change', this.setChecked);
             this.render();
         },
 
@@ -72,8 +98,21 @@ define(['text!components/item/itemComponent.tpl.html',
             return this.$el;
         },
 
-        selectItem: function(){
-            this.model.set({ "checked": true});
+        toggleChecked: function(){
+          if(this.model.toogleCheckeModel()){
+              this.setChecked()
+          }else{
+              this.unChecked()
+          }
+
+        },
+
+        setChecked: function(){
+            $(this.$el).find(".todo-component_item_label_checkbox").prop({"checked":true})
+        },
+
+        unChecked: function(){
+            $(this.$el).find(".todo-component_item_label_checkbox").prop({"checked":false})
         },
 
         /*manipulation*/
@@ -96,7 +135,8 @@ define(['text!components/item/itemComponent.tpl.html',
 
         events:{
             "keypress .todo-component_adding-task_input": "createOneItem",
-            "click .todo-component_remove-button"       : "removeSelctedItems"
+            "click .todo-component_remove-button"       : "removeSelectedItems",
+            "click .todo-component_checking-tasks_label": "selectAllItems"
         },
 
         template: _.template(ComponentTemplate),
@@ -110,12 +150,10 @@ define(['text!components/item/itemComponent.tpl.html',
         },
 
         render: function(){
-
             $(this.$el).html(this.template());
         },
 
         renderCollectionLength: function(){
-
             $(this.el).find('.counter').html(this.collection.length);
         },
 
@@ -127,26 +165,27 @@ define(['text!components/item/itemComponent.tpl.html',
             }
         },
 
-        addOneItem: function(model){
+        addOneItem: function(model) {
             var component = new TodoItem({model:model}).render();
             $(".todo-component_item-wrapper").append(component);
         },
 
         cleanInput: function(){
-
             $(this.$el).find('.todo-component_adding-task_input').val(' ');
-
         },
 
-        removeSelctedItems: function(){
+        removeSelectedItems: function(){
             _.each(this.collection.done(), function(item){
                 var modelToJson = item.toJSON();
                 if(modelToJson.checked){
                     item.clear();    
                 }
             })
-        }
+        },
 
+        selectAllItems: function(){
+            this.collection.checkedAllModels();
+        }
 
     });
 
