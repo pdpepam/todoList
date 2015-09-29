@@ -163,3 +163,24 @@ body {
     will-change: right; }
 
 /*# sourceMappingURL=itemComponent.css.map */
+
+.todo-component_item_label_task{
+  outline: none;
+}
+
+.todo-component_item_label_task_title__unchecked{
+  background: #F5F5F5;
+  border: none;
+}
+
+.todo-component_item-wrapper{
+  min-height: 65px;
+}
+.todo-component_wrapper{
+  height: auto;
+}
+
+
+.todo-component_item_label_task_title{
+  width: 100%;
+}

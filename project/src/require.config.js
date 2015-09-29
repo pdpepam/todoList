@@ -19,14 +19,9 @@ require.config({
       
         /**
          *apps components */
-        'boardComponent'   : componentsPath + 'item/itemComponent',
+        'boardComponent'   : componentsPath + 'item/newToDo'
         
-        /**
-         * components wendor*/
-        'componentsVendor': 'components/componentsVendor/main',
 
-        //libsVendor
-        "libsVendor" : "libsVendor"
 
     },
 
